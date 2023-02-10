@@ -24,32 +24,62 @@ class _ResultScreenState extends State<ResultScreen> {
 
   findBook() async {
     String query = widget.text.replaceAll('\n', ' ');
-    if (query.length > 100) {
-      query = query.substring(0, 100);
-    }
+
     _books = await _booksService.searchAPIBook(query);
     setState(() {});
   }
 
   @override
   Widget build(BuildContext context) => Scaffold(
-      appBar: AppBar(
-        title: const Text('Result'),
-      ),
-      body: ListView.builder(
-          itemCount: _books.length,
-          itemBuilder: (context, index) {
-            final book = _books[index];
-            return Column(
-              children: [
-                Image.network(
-                  book.thumbnail ?? '',
-                  width: 200,
-                  height: 300,
-                ),
-                const SizedBox(height: 20),
-                Text(book.title ?? ''),
-              ],
-            );
-          }));
+          body: SafeArea(
+        child: Column(
+
+          children: [
+            Expanded(
+                child: _books.isEmpty
+                    ? const SizedBox()
+                    : Column(
+                        children: [
+                          Text(
+                            _books[0].title ?? '',
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 24),
+                          ),
+                          const SizedBox(height: 10),
+                          Expanded(
+                            child: Image.network(
+                              _books[0].thumbnail ?? '',
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ],
+                      )),
+            if (_books.length > 1) ...[
+              const SizedBox(height: 10),
+              const Text('Other Matches'),
+              const SizedBox(height: 10),
+              SizedBox(
+                height: 250,
+                child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.all(16),
+                    itemCount: _books.length - 1,
+                    itemBuilder: (context, index) {
+                      final book = _books[index + 1];
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 16),
+                        child: Image.network(
+                          book.thumbnail ?? '',
+                          width: 150,
+                          height: 200,
+                          fit: BoxFit.cover,
+                        ),
+                      );
+                    }),
+              ),
+            ],
+          ],
+        ),
+      ));
 }
