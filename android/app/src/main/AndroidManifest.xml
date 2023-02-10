@@ -1,6 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.wmfadel.book_lens">
-   <application
+    <uses-permission android:name="android.permission.CAMERA" />
+    <application
         android:label="book_lens"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
