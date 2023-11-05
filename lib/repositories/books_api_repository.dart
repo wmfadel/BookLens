@@ -2,21 +2,30 @@ import 'dart:convert';
 import 'dart:async';
 import 'package:http/http.dart' as http;
 
-import 'api_book.dart';
+import 'package:book_lens/models/api_book.dart';
 
-class BooksAPISearchService {
+class BooksAPIRepository {
   final String _searchURL = 'https://www.googleapis.com/books/v1/volumes?q=';
 
   Future<List<APIBook>> searchAPIBook(String name) async {
     String url = _searchURL + name;
-    print('searching for book on $url');
     http.Response response = await http.get(Uri.tryParse(url)!);
-    Map<String, dynamic> res = json.decode(response.body);
+    var res = json.decode(response.body);
+
+    if (res == null ||
+        res is! Map ||
+        res['items'] == null ||
+        res['items'] is! List) {
+      return [];
+    }
     List<APIBook> books = [];
     for (var item in res['items']) {
-      books.add(APIBook.fromJson(item));
+      try {
+        books.add(APIBook.fromJson(item));
+      } catch (e) {
+        // TODO: log error to logging service
+      }
     }
-    print('books found ${books[0].toJson()}');
     return books;
   }
 }
