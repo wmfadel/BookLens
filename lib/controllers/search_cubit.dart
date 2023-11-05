@@ -35,6 +35,19 @@ class SearchCubit extends Cubit<SearchState> {
     _cameraService.stopCamera();
   }
 
+  Future<void> scanImage() async {
+    try {
+      final text = await _cameraService.scanPicture();
+      emit(
+        text != null
+            ? ScanCompleted(text)
+            : const ScanError('Failed to scan content'),
+      );
+    } catch (e) {
+      emit(CameraError(message: e.toString()));
+    }
+  }
+
   search(String content) async {
     if (content.isEmpty) {
       return emit(const SearchError(message: 'Please enter a book name'));
