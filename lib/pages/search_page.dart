@@ -1,4 +1,7 @@
 import 'package:book_lens/controllers/search_cubit.dart';
+import 'package:book_lens/pages/results_page.dart';
+import 'package:book_lens/widgets/search/search_error_view.dart';
+import 'package:book_lens/widgets/search/search_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -51,23 +54,41 @@ class _SearchPageState extends State<SearchPage> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [
-          // Expanded(
-          // child: CameraPreview(_cameraController!),
-          // ),
-          Container(
-            padding: const EdgeInsets.all(24),
-            child: Center(
-              child: FloatingActionButton(
-                onPressed: () {
-                  // _scanImage();
-                },
-                child: const Icon(Icons.camera_alt),
+      body: BlocConsumer<SearchCubit, SearchState>(
+        listener: (context, state) {
+          if (state is ScanError) {
+            ScaffoldMessenger.of(context)
+              ..removeCurrentMaterialBanner()
+              ..showMaterialBanner(
+                MaterialBanner(
+                  content: Text(state.error),
+                  actions: [
+                    TextButton(
+                        onPressed: () => ScaffoldMessenger.of(context)
+                            .removeCurrentMaterialBanner(),
+                        child: const Icon(Icons.clear))
+                  ],
+                ),
+              );
+          } else if (state is ScanCompleted) {
+            _searchCubit.search(state.text);
+          } else if (state is SearchCompleted) {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => ResultScreen(books: state.books),
               ),
-            ),
-          ),
-        ],
+            );
+          }
+        },
+        builder: (context, state) {
+          if (state is CameraLoading || state is SearchLoading) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (state is SearchError || state is CameraError) {
+            return const SearchErrorView();
+          } else {
+            return const SearchView();
+          }
+        },
       ),
     );
   }

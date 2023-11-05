@@ -19,6 +19,22 @@ class CameraCompleted extends SearchState {
   List<Object> get props => [];
 }
 
+class ScanCompleted extends SearchState {
+  final String text;
+  const ScanCompleted(this.text);
+
+  @override
+  List<Object> get props => [text];
+}
+
+class ScanError extends SearchState {
+  final String error;
+  const ScanError(this.error);
+
+  @override
+  List<Object> get props => [error];
+}
+
 class CameraError extends SearchState {
   final String? message;
 

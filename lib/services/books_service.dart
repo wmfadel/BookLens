@@ -8,12 +8,8 @@ class BooksService {
   }) : _booksAPIRepository = booksAPIRepository ?? BooksAPIRepository();
 
   final BooksAPIRepository _booksAPIRepository;
-  List<APIBook> _results = [];
-
-  List<APIBook> get results => [..._results];
 
   Future<List<APIBook>> searchAPIBook(String name) async {
-    _results = await _booksAPIRepository.searchAPIBook(name);
-    return results;
+    return await _booksAPIRepository.searchAPIBook(name);
   }
 }
